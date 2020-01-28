@@ -4,7 +4,6 @@
   "description": "CLI tool for monitoring branches state",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
     "branch-status": "src/index.js"
