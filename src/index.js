@@ -23,10 +23,12 @@ const logError = (message, exitCode = undefined) => {
     if (exitCode !== undefined) process.exit(exitCode);
 };
 
+const appConfDir = `${process.env.HOME}/.config/branch-status`;
+
 const readToken = () => {
     if (accessToken === undefined) {
         try {
-            accessToken = fs.readFileSync(`${process.env.HOME}/.config/branch-status/.token`, { encoding: 'utf8' });
+            accessToken = fs.readFileSync(`${appConfDir}/.token`, { encoding: 'utf8' }).trim();
         } catch (e) {
             logError('Please provide your token to access YouTack!');
             console.log('See: https://www.jetbrains.com/help/youtrack/incloud/Manage-Permanent-Token.html');
@@ -36,8 +38,13 @@ const readToken = () => {
     }
 };
 
-const colorizeState = (state) => {
-    const map = {
+const loadColorMap = () => {
+    if (fs.existsSync(`${appConfDir}/colorMap.js`)) {
+        // const mapFromFile = require(`${appConfDir}/colorMap.js`);
+        // console.log(mapFromFile);
+    }
+
+    return {
         'Implemented': chalk.green,
         'To be discussed': chalk.red,
         'Wait for Reply': chalk.red,
@@ -48,8 +55,13 @@ const colorizeState = (state) => {
         'Under Verification': chalk.blue,
         'Verified': chalk.blue,
     };
-    const func = map[state.trim()] ? map[state.trim()] : (e) => e;
-    return func(state);
+};
+
+const colorMap = loadColorMap();
+
+const colorizeState = (state) => {
+    const found = colorMap[state.trim()];
+    return found ? found(state) : state;
 };
 
 
@@ -79,8 +91,8 @@ const main = async () => {
 
     if (program.sort) ora.start();
 
-    for (const [i, id] of issues.entries()) {
-        if(program.sort) ora.text = `(${i}/${issues.length}) Fetching issue ${id}`;
+    for (const [ i, id ] of issues.entries()) {
+        if (program.sort) ora.text = `(${i}/${issues.length}) Fetching issue ${id}`;
         const {
             data: {
                 resolved,
