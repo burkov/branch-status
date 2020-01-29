@@ -24,7 +24,7 @@ const logError = (message, exitCode = undefined) => {
 const readToken = () => {
   if (accessToken === undefined) {
     try {
-      accessToken = fs.readFileSync('~/.config/branch-status/.token', {encoding: 'utf8'});
+      accessToken = fs.readFileSync(`${process.env.HOME}/.config/branch-status/.token`, {encoding: 'utf8'});
     } catch (e) {
       logError('Please provide your token to access YouTack!');
       console.log('See: https://www.jetbrains.com/help/youtrack/incloud/Manage-Permanent-Token.html');
