@@ -39,22 +39,37 @@ const readToken = () => {
 };
 
 const loadColorMap = () => {
-    if (fs.existsSync(`${appConfDir}/colorMap.js`)) {
-        // const mapFromFile = require(`${appConfDir}/colorMap.js`);
-        // console.log(mapFromFile);
+    const configFile = `${appConfDir}/config.js`;
+    const defaultColorMapFunction = function (chalk) {
+        return {
+            'Implemented': chalk.green,
+            'To be discussed': chalk.red,
+            'Wait for Reply': chalk.red,
+            'In Progress': chalk.yellow,
+            'Reopened': chalk.yellow,
+            'Incomplete': chalk.yellow,
+            'Without Verification': chalk.blue,
+            'Under Verification': chalk.blue,
+            'Verified': chalk.blue,
+        };
+    };
+    if (!fs.existsSync(configFile)) {
+        console.log(chalk.yellow(`Now you can adjust output colors in config file: `) + configFile);
+        fs.mkdirSync(appConfDir, { recursive: true });
+        fs.writeFileSync(configFile, `// find available colors at: https://github.com/chalk/chalk#readme
+module.exports = {
+    makeColorMap: ${defaultColorMapFunction.toString()}
+};
+`);
     }
 
-    return {
-        'Implemented': chalk.green,
-        'To be discussed': chalk.red,
-        'Wait for Reply': chalk.red,
-        'In Progress': chalk.yellow,
-        'Reopened': chalk.yellow,
-        'Incomplete': chalk.yellow,
-        'Without Verification': chalk.blue,
-        'Under Verification': chalk.blue,
-        'Verified': chalk.blue,
-    };
+    try {
+        const { makeColorMap } = require(configFile);
+        return makeColorMap(chalk);
+    } catch (e) {
+        logError(`Failed to load color map from config file, using default one.`)
+        return defaultColorMapFunction(chalk);
+    }
 };
 
 const colorMap = loadColorMap();
