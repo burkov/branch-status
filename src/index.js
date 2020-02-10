@@ -89,11 +89,8 @@ const main = async () => {
 
   const issues = stdout
     .split('\n')
-    .map((l) => {
-      let result = /(JPF-[0-9]+)/.exec(l);
-      return result ? result[1] : undefined;
-    })
-    .filter((e) => e !== undefined);
+    .flatMap((line) => line.match(/jpf-\d{1,6}/ig) || [])
+    .map((x) => x.toUpperCase());
 
   console.log(chalk.green(`Fetching YT issue statuses for ${issues.length} branches...`));
   program.sort = !program.noSort;
