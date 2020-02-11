@@ -8,11 +8,12 @@ const dayjs = require('dayjs');
 const Ora = require('ora');
 
 let accessToken;
-program.version('1.0.0');
+program.version('1.4.0');
 program.name('branch-status');
 program.arguments('<token>');
 program.option('--skip-released', `don't show issues in Released state`, false);
 program.option('--no-sort', 'do not sort', false);
+program.option('--issue-prefix <prefix>', 'show only issues with given prefix', undefined);
 program.action((arg) => {
   accessToken = arg;
 });
@@ -89,7 +90,8 @@ const main = async () => {
 
   const issues = stdout
     .split('\n')
-    .flatMap((line) => line.match(/jpf-\d{1,6}/ig) || [])
+    .flatMap((line) => line.match(/\w{2,4}-\d{1,6}/ig) || [])
+    .filter((issueId) => (program.issuePrefix === undefined) || (RegExp(program.issuePrefix, 'i').test(issueId)))
     .map((x) => x.toUpperCase());
 
   console.log(chalk.green(`Fetching YT issue statuses for ${issues.length} branches...`));
@@ -105,27 +107,31 @@ const main = async () => {
 
   for (const [ i, id ] of issues.entries()) {
     if (program.sort) ora.text = `(${i}/${issues.length}) Fetching issue ${id}`;
-    const {
-      data: {
-        resolved,
-        customFields,
-        summary,
-      },
-    } = await axios.get(`https://youtrack.jetbrains.com/api/issues/${id}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      params: {
-        fields: 'summary,resolved,customFields(id,projectCustomField(field(name)),value(name))',
-      },
-    });
-    const resDate = resolved ? dayjs(resolved).format('YYYY-MM-DD') : '----------';
-    const state = customFields.find((e) => e.id === '123-1006').value.name;
-    if (state === 'Released' && program.skipReleased) continue;
-    const stateColorized = colorizeState(state.padEnd(20));
-    const formatted = `[${id.padEnd(9)}]  ${resDate}  ${stateColorized}  ${summary}`;
-    if (program.noSort) console.log(formatted);
-    else result.push({ state, resolved, formatted });
+    try {
+      const {
+        data: {
+          resolved,
+          customFields,
+          summary,
+        },
+      } = await axios.get(`https://youtrack.jetbrains.com/api/issues/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          fields: 'summary,resolved,customFields(id,projectCustomField(field(name)),value(name))',
+        },
+      });
+      const resDate = resolved ? dayjs(resolved).format('YYYY-MM-DD') : '----------';
+      const state = customFields.find((e) => e.id === '123-1006').value.name;
+      if (state === 'Released' && program.skipReleased) continue;
+      const stateColorized = colorizeState(state.padEnd(20));
+      const formatted = `[${id.padEnd(9)}]  ${resDate}  ${stateColorized}  ${summary}`;
+      if (program.noSort) console.log(formatted);
+      else result.push({ state, resolved, formatted });
+    } catch (e) {
+
+    }
   }
 
   if (program.sort) {
