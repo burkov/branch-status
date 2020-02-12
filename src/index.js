@@ -115,6 +115,7 @@ const main = async () => {
           summary,
         },
       } = await axios.get(`https://youtrack.jetbrains.com/api/issues/${id}`, {
+        timeout: 5000,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -130,7 +131,8 @@ const main = async () => {
       if (program.noSort) console.log(formatted);
       else result.push({ state, resolved, formatted });
     } catch (e) {
-
+      ora.fail(`Failed to fetch issue ${id} data: ${e.message}`);
+      ora.start(`Resuming...`);
     }
   }
 
