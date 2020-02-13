@@ -8,7 +8,7 @@ const dayjs = require('dayjs');
 const Ora = require('ora');
 
 let accessToken;
-program.version('1.4.0');
+program.version('1.4.2');
 program.name('branch-status');
 program.arguments('<token>');
 program.option('--skip-released', `don't show issues in Released state`, false);
@@ -88,11 +88,11 @@ const main = async () => {
     logError('Failed to run git branch', code);
   }
 
-  const issues = stdout
+  const issues = [ ...new Set(stdout
     .split('\n')
     .flatMap((line) => line.match(/\w{2,4}-\d{1,6}/ig) || [])
     .filter((issueId) => (program.issuePrefix === undefined) || (RegExp(program.issuePrefix, 'i').test(issueId)))
-    .map((x) => x.toUpperCase());
+    .map((x) => x.toUpperCase())) ];
 
   console.log(chalk.green(`Fetching YT issue statuses for ${issues.length} branches...`));
   program.sort = !program.noSort;
