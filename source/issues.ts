@@ -41,7 +41,7 @@ export function isPendingIssue(a: any): a is PendingIssue {
 
 export type Issue = FailedIssue | ResolvedIssue;
 
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(() => resolve(undefined), ms));
+// export const sleep = (ms: number) => new Promise((resolve) => setTimeout(() => resolve(undefined), ms));
 
 const httpGet = (accessToken: string, url: string, params?: any) => {
 	return axios.get(url, {
@@ -60,8 +60,6 @@ export const fetchIssue = async (accessToken: string, id: string): Promise<Issue
 		} = await httpGet(accessToken, `https://youtrack.jetbrains.com/api/issues/${id}`, {
 			fields: 'summary,resolved,tags(name,id),customFields(id,projectCustomField(field(name)),value(name))',
 		});
-
-		await sleep(Math.random() * 300);
 		return {
 			id,
 			state: customFields.find((e: any) => e.id === '123-1006').value.name,
