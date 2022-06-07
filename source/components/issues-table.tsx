@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { substringAfter, truncate } from '../misc';
 import { RepoIssue } from '../git';
 import Spinner from 'ink-spinner';
+import { getCliArgumentsAndParams } from '../cli';
 
 const colors: { [key: string]: any } = {
 	Implemented: 'green',
@@ -89,6 +90,7 @@ export const Description: FC<{ issue: Issue }> = ({ issue: { summary, errorDescr
 
 export const IssuesRow: FC<{ issue: Issue }> = ({ issue }) => {
 	const { issueId, resolvedDate, onBoard, duty } = issue;
+	const { showIssuesOnMasterBranch } = getCliArgumentsAndParams();
 	return (
 		<Box>
 			<Text>
@@ -98,8 +100,12 @@ export const IssuesRow: FC<{ issue: Issue }> = ({ issue }) => {
 				{'  '}
 				<IssueState issue={issue} />
 				{'  '}
-				<Branches issue={issue} />
-				{'  '}
+				{showIssuesOnMasterBranch && (
+					<>
+						<Branches issue={issue} />
+						{'  '}
+					</>
+				)}
 				<Description issue={issue} />
 			</Text>
 		</Box>

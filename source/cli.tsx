@@ -3,7 +3,6 @@ import React from 'react';
 import { render } from 'ink';
 import meow from 'meow';
 import App from './components/app';
-import { resolveToken } from './token';
 
 const cli = meow(
 	`
@@ -28,4 +27,18 @@ const cli = meow(
 	},
 );
 
-render(<App token={resolveToken(cli.flags.token)} path={cli.input[0]} showMasterIssues={cli.flags.master} />);
+export interface Config {
+	path: string;
+	showIssuesOnMasterBranch: boolean;
+	youTrackApiToken?: string;
+}
+
+export const getCliArgumentsAndParams = (): Config => {
+	return {
+		path: cli.input[0] ?? '.',
+		showIssuesOnMasterBranch: cli.flags.master,
+		youTrackApiToken: cli.flags.token,
+	};
+};
+
+render(<App />);

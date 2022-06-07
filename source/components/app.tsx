@@ -3,14 +3,14 @@ import { NoTokenBanner } from './no-token-banner';
 import { IssuesTable } from './issues-table';
 import { issuesFromRepo } from '../git';
 import { NotInAGitRepo } from './not-in-a-git-repo';
+import { getCliArgumentsAndParams } from '../cli';
+import { resolveToken } from '../token';
 
-const App: FC<{ token?: string; path?: string; showMasterIssues: boolean }> = ({
-	token,
-	path = '.',
-	showMasterIssues,
-}) => {
+const App: FC = () => {
+	const { path, youTrackApiToken, showIssuesOnMasterBranch } = getCliArgumentsAndParams();
+	const token = resolveToken(youTrackApiToken);
 	if (!token) return <NoTokenBanner />;
-	const issues = issuesFromRepo(path, showMasterIssues);
+	const issues = issuesFromRepo(path, showIssuesOnMasterBranch);
 	if (!issues) return <NotInAGitRepo />;
 	return <IssuesTable token={token} repoIssues={issues} />;
 };
