@@ -8,7 +8,7 @@ import { resolveToken } from './token';
 const cli = meow(
 	`
 	Usage
-	  $ branch-status
+	  $ branch-status [path]
 
 	Options
 	  --token a YouTrack token if not already save in config file
@@ -22,4 +22,4 @@ const cli = meow(
 	},
 );
 
-render(<App token={resolveToken(cli.flags.token)} />);
+render(<App token={resolveToken(cli.flags.token)} path={cli.input[0]} />);

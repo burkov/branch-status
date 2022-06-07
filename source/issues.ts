@@ -1,47 +1,29 @@
 import axios from 'axios';
+import { RepoIssue } from './git';
 
-export enum State {
-	PENDING = '__pending',
-	FAILED = '__failed',
-}
-
-export interface PendingIssue {
-	id: string;
-	state: State.PENDING;
-}
-
-export interface FailedIssue {
-	id: string;
-	state: State.FAILED;
-	description: string;
-}
-
-export interface ResolvedIssue {
-	id: string;
-	state: string;
+export interface Issue {
+	issueId: string;
+	branches: string[];
+	state?: string;
+	errorDescription?: string;
 	testedBy?: string;
-	branch?: string;
-	resolved?: string;
-	summary: string;
-	onBoard: boolean;
-	duty: boolean;
+	resolvedDate?: string;
+	summary?: string;
+	onBoard?: boolean;
+	duty?: boolean;
 }
 
-export function isResolvedIssue(a: any): a is ResolvedIssue {
-	return 'state' in a && 'resolved' in a;
-}
+export const isFromMaster = ({ branches }: Issue): boolean => {
+	return branches.length === 1 && branches[0] === 'master';
+};
 
-export function isFailedIssue(a: any): a is FailedIssue {
-	return 'state' in a && a.state === State.FAILED;
-}
+export const isReleased = ({ state }: Issue) => {
+	return state === 'Released';
+};
 
-export function isPendingIssue(a: any): a is PendingIssue {
-	return 'state' in a && a.state === State.PENDING;
-}
-
-export type Issue = FailedIssue | ResolvedIssue;
-
-// export const sleep = (ms: number) => new Promise((resolve) => setTimeout(() => resolve(undefined), ms));
+export const fromRepoIssue = ({ issueId, branches }: RepoIssue): Issue => {
+	return { issueId, branches };
+};
 
 const httpGet = (accessToken: string, url: string, params?: any) => {
 	return axios.get(url, {
@@ -53,25 +35,29 @@ const httpGet = (accessToken: string, url: string, params?: any) => {
 	});
 };
 
-export const fetchIssue = async (accessToken: string, id: string): Promise<Issue> => {
+export const fetchIssue = async (accessToken: string, { issueId, branches }: RepoIssue): Promise<Issue> => {
 	try {
 		const {
-			data: { resolved, customFields, summary, tags },
-		} = await httpGet(accessToken, `https://youtrack.jetbrains.com/api/issues/${id}`, {
+			data: { resolved: resolvedDate, customFields, summary, tags },
+		} = await httpGet(accessToken, `https://youtrack.jetbrains.com/api/issues/${issueId}`, {
 			fields: 'summary,resolved,tags(name,id),customFields(id,projectCustomField(field(name)),value(name))',
 		});
 		return {
-			id,
-			state: customFields.find((e: any) => e.id === '123-1006').value.name,
-			testedBy: customFields.find((e: any) => e.id === '133-531').value?.name,
-			branch: customFields.find((e: any) => e.id === '113-1375').value,
+			issueId,
+			state: customFields.find((e: any) => e.id === '123-1006')?.value.name,
+			testedBy: customFields.find((e: any) => e.id === '133-531')?.value?.name,
+			// branch: customFields.find((e: any) => e.id === '113-1375').value,
+			branches,
 			onBoard: tags?.findIndex(({ id }: any) => id === '68-150282') !== -1,
 			duty: tags?.findIndex(({ id }: any) => id === '68-26101') !== -1,
-			resolved,
+			resolvedDate,
 			summary,
 		};
 	} catch (e) {
-		const description = axios.isAxiosError(e) ? e.message : 'unknown error';
-		return { id, state: State.FAILED, description };
+		const errorDescription = axios.isAxiosError(e) ? e.message : 'unknown error';
+		if (errorDescription == 'unknown error') {
+			console.log(e);
+		}
+		return { issueId, branches, errorDescription };
 	}
 };
