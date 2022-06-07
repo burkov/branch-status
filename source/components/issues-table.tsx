@@ -6,6 +6,8 @@ import { substringAfter, truncate } from '../misc';
 import { RepoIssue } from '../git';
 import Spinner from 'ink-spinner';
 import { getCliArgumentsAndParams } from '../cli';
+import { NoIssuesBranches } from './no-issue-branches';
+import { deployedBranch, envs } from '../envs';
 
 const colors: { [key: string]: any } = {
 	Implemented: 'green',
@@ -64,16 +66,30 @@ export const Branches: FC<{ issue: Issue }> = ({ issue }) => {
 	return <Text color="green">{fromMaster ? 'master' : '      '}</Text>;
 };
 
+export const Env: FC<{ branches: string[]; branchEnv: [string, string][]; emptyPlaceholder?: string }> = ({
+	branches,
+	branchEnv,
+	emptyPlaceholder,
+}) => {
+	const [, env] = branchEnv.find(([b]) => branches.some((e) => e.includes(b))) ?? [];
+	if (!env) return emptyPlaceholder ? <Text>{emptyPlaceholder}</Text> : null;
+	return <Text color="cyan">[{env}]</Text>;
+};
+
 export const TestedBy: FC<{ testedBy?: string }> = ({ testedBy }) => {
 	if (!testedBy) return null;
 	return <Text color="magenta">[{substringAfter(testedBy, ' ')}] </Text>;
 };
 
-export const Description: FC<{ issue: Issue }> = ({ issue: { summary, errorDescription, testedBy } }) => {
+export const Description: FC<{ issue: Issue; branchEnv: [string, string][] }> = ({
+	issue: { summary, errorDescription, testedBy, branches },
+	branchEnv,
+}) => {
 	if (errorDescription) return <Text>{truncate(errorDescription, 120)}</Text>;
 	if (summary)
 		return (
 			<Text>
+				<Env branches={branches} branchEnv={branchEnv} />
 				<TestedBy testedBy={testedBy} />
 				{truncate(summary ?? '', 120)}
 			</Text>
@@ -88,7 +104,7 @@ export const Description: FC<{ issue: Issue }> = ({ issue: { summary, errorDescr
 	);
 };
 
-export const IssuesRow: FC<{ issue: Issue }> = ({ issue }) => {
+export const IssuesRow: FC<{ issue: Issue; branchEnv: [string, string][] }> = ({ issue, branchEnv }) => {
 	const { issueId, resolvedDate, onBoard, duty } = issue;
 	const { showIssuesOnMasterBranch } = getCliArgumentsAndParams();
 	return (
@@ -106,19 +122,24 @@ export const IssuesRow: FC<{ issue: Issue }> = ({ issue }) => {
 						{'  '}
 					</>
 				)}
-				<Description issue={issue} />
+				<Description issue={issue} branchEnv={branchEnv} />
 			</Text>
 		</Box>
 	);
 };
 
-export const IssuesTable: FC<{ token: string; repoIssues: RepoIssue[] }> = ({ repoIssues, token }) => {
+export const IssuesTable: FC<{ token: string; repoIssues: RepoIssue[]; noIssuesBranches: string[] }> = ({
+	repoIssues,
+	token,
+	noIssuesBranches,
+}) => {
 	const initialState = repoIssues
 		.map(fromRepoIssue)
 		.filter((e) => !isFromMaster(e))
 		.sort((a, b) => a.issueId.localeCompare(b.issueId));
 
 	const [resolved, setResolved] = useState<Issue[]>(initialState);
+	const [branchEnv, setBranchEnv] = useState<[string, string][]>([]);
 
 	useEffect(() => {
 		for (const issue of repoIssues) {
@@ -136,13 +157,21 @@ export const IssuesTable: FC<{ token: string; repoIssues: RepoIssue[] }> = ({ re
 				}),
 			);
 		}
+		for (const envName in envs) {
+			deployedBranch(envName).then((deployedBranchToEnvName) => {
+				setBranchEnv((prev) => {
+					return [...prev, deployedBranchToEnvName];
+				});
+			});
+		}
 	}, []);
 
 	return (
 		<>
 			{resolved.map((issue) => {
-				return <IssuesRow issue={issue} key={issue.issueId} />;
+				return <IssuesRow issue={issue} key={issue.issueId} branchEnv={branchEnv} />;
 			})}
+			<NoIssuesBranches noIssuesBranches={noIssuesBranches} branchEnv={branchEnv} />
 		</>
 	);
 };

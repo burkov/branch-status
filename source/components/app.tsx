@@ -10,9 +10,9 @@ const App: FC = () => {
 	const { path, youTrackApiToken, showIssuesOnMasterBranch } = getCliArgumentsAndParams();
 	const token = resolveToken(youTrackApiToken);
 	if (!token) return <NoTokenBanner />;
-	const issues = issuesFromRepo(path, showIssuesOnMasterBranch);
+	const [issues, noIssueBranches] = issuesFromRepo(path, showIssuesOnMasterBranch);
 	if (!issues) return <NotInAGitRepo />;
-	return <IssuesTable token={token} repoIssues={issues} />;
+	return <IssuesTable token={token} repoIssues={issues} noIssuesBranches={noIssueBranches} />;
 };
 
 module.exports = App;
