@@ -21,8 +21,12 @@ export const IssueState: FC<{ state: string }> = ({ state }) => {
 	return <Text color={colors[state]}>{state.padStart(20)}</Text>;
 };
 
-export const IssueId: FC<{ id: string }> = ({ id }) => {
-	return <Text>[{id.padStart(10, ' ')}]</Text>;
+export const IssueId: FC<{ id: string; onBoard?: boolean; duty?: boolean }> = ({ id, onBoard, duty }) => {
+	return (
+		<Text backgroundColor={onBoard ? 'yellow' : undefined} color={duty ? 'blue' : undefined}>
+			[{id.padStart(10, ' ')}]
+		</Text>
+	);
 };
 
 export const Date: FC<{ resolved?: string }> = ({ resolved }) => {
@@ -73,7 +77,7 @@ export const IssuesRow: FC<{ issue: Issue | PendingIssue }> = ({ issue }) => {
 					{'  '}
 					<Text color="red">{':FAILED:'.padStart(20)}</Text>
 					{'  '}
-					<Flags onBoard={false} duty={false} /> <Text>{truncate(issue.description, 120)}</Text>
+					<Text>{truncate(issue.description, 120)}</Text>
 				</Text>
 			</>
 		);
@@ -81,13 +85,13 @@ export const IssuesRow: FC<{ issue: Issue | PendingIssue }> = ({ issue }) => {
 	return (
 		<Box>
 			<Text>
-				<IssueId id={id} />
+				<IssueId id={id} onBoard={onBoard} duty={duty} />
 				{'  '}
 				<Date resolved={resolved} />
 				{'  '}
 				<IssueState state={state} />
 				{'  '}
-				<Flags onBoard={onBoard} duty={duty} /> <TestedBy testedBy={testedBy} />
+				<TestedBy testedBy={testedBy} />
 				{truncate(summary, 120)} <Branch branch={branch} />
 			</Text>
 		</Box>
