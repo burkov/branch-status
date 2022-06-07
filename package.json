@@ -16,7 +16,8 @@
 		"up": "npm-check-updates -u -x meow && typesync && yarn"
 	},
 	"files": [
-		"dist/*.js"
+		"dist/*.js",
+		"dist/components/*.js"
 	],
 	"dependencies": {
 		"axios": "^0.27.2",
