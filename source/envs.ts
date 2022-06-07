@@ -11,7 +11,7 @@ export const envs: { [key: string]: string } = {
 
 export const deployedBranch = async (key: string): Promise<[string, string]> => {
 	const host = envs[key];
-	const { data }: { data: string } = await axios.get(`${host}/build`);
+	const { data }: { data: string } = await axios.get(`${host}/build`, { timeout: 5000 });
 	const firstDashIndex = data.indexOf('-');
 	const secondDashIndex = data.indexOf('-', firstDashIndex + 1);
 	const lastDashIndex = data.lastIndexOf('-');

@@ -58,8 +58,6 @@ export const issuesFromRepo = (path: string, showMasterIssues: boolean): [RepoIs
 		});
 	}
 
-	console.log([...noIssueBranches]);
-
 	return [
 		devMode ? result.slice(1, 5) : result,
 		[...noIssueBranches]
