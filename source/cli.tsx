@@ -11,7 +11,7 @@ const cli = meow(
 
 	Options
 	  --token       a YouTrack token if not already save in config file
-	  -m, --master  show issue on master branch
+	  -m, --master  show issues on a master branch
 `,
 	{
 		flags: {

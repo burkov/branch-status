@@ -7,7 +7,7 @@ export interface Issue {
 	state?: string;
 	errorDescription?: string;
 	testedBy?: string;
-	resolvedDate?: string;
+	resolvedDate?: number;
 	summary?: string;
 	onBoard?: boolean;
 	duty?: boolean;
@@ -55,9 +55,6 @@ export const fetchIssue = async (accessToken: string, { issueId, branches }: Rep
 		};
 	} catch (e) {
 		const errorDescription = axios.isAxiosError(e) ? e.message : 'unknown error';
-		if (errorDescription == 'unknown error') {
-			console.log(e);
-		}
 		return { issueId, branches, errorDescription };
 	}
 };

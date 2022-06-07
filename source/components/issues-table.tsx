@@ -44,7 +44,7 @@ export const IssueId: FC<{ id: string; onBoard?: boolean; duty?: boolean }> = ({
 	);
 };
 
-const dateColor = (date?: string): string | undefined => {
+const dateColor = (date?: number): string | undefined => {
 	if (!date) return undefined;
 	const daysPassed = dayjs().diff(dayjs(date), 'days');
 	if (daysPassed < 10) return 'green';
@@ -53,9 +53,9 @@ const dateColor = (date?: string): string | undefined => {
 	return undefined;
 };
 
-const formatDate = (date?: string) => (date ? dayjs(date).format('YYYY-MM-DD') : '----------');
+const formatDate = (date?: number) => (date ? dayjs(date).format('YYYY-MM-DD') : '----------');
 
-export const Date: FC<{ resolved?: string }> = ({ resolved }) => {
+export const Date: FC<{ resolved?: number }> = ({ resolved }) => {
 	return <Text color={dateColor(resolved)}>{formatDate(resolved)}</Text>;
 };
 
@@ -126,8 +126,12 @@ export const IssuesTable: FC<{ token: string; repoIssues: RepoIssue[] }> = ({ re
 				setResolved((prev) => {
 					if (isFromMaster(resolvedIssue) && isReleased(resolvedIssue)) return prev;
 					const newList = prev.filter(({ issueId }) => issueId !== resolvedIssue.issueId);
-					return [...newList, resolvedIssue].sort(({ state: stateA }, { state: stateB }) =>
-						(stateA ?? '')?.localeCompare(stateB ?? ''),
+					return [...newList, resolvedIssue].sort(
+						({ state: stateA, resolvedDate: rdA }, { state: stateB, resolvedDate: rdB }) => {
+							const byState = (stateA ?? '')?.localeCompare(stateB ?? '');
+							const byDate = (rdA ?? 0) - (rdB ?? 0);
+							return byState !== 0 ? byState : byDate;
+						},
 					);
 				}),
 			);
