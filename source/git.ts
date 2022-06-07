@@ -28,7 +28,7 @@ const parseIssueIds = (s: string): string[] => {
 	return (s.match(/\w{3,4}-\d{2,6}/gi) ?? []).map((e) => e.toUpperCase().trim());
 };
 
-export const issuesFromRepo = (path: string): RepoIssue[] => {
+export const issuesFromRepo = (path: string, showMasterIssues: boolean): RepoIssue[] => {
 	const devMode = false; //__dirname.includes('IdeaProjects/branch-status');
 
 	const idToBranches = new Map<string, Set<string>>();
@@ -44,9 +44,11 @@ export const issuesFromRepo = (path: string): RepoIssue[] => {
 		result.push({ issueId, branches: [...branches].sort() });
 	});
 
-	new Set(masterCommits(path).flatMap(parseIssueIds)).forEach((issueId) => {
-		if (!idToBranches.has(issueId)) result.push({ issueId, branches: ['master'] });
-	});
+	if (showMasterIssues) {
+		new Set(masterCommits(path).flatMap(parseIssueIds)).forEach((issueId) => {
+			if (!idToBranches.has(issueId)) result.push({ issueId, branches: ['master'] });
+		});
+	}
 
 	return devMode ? result.slice(1, 5) : result;
 };
