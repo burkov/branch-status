@@ -21,7 +21,12 @@ const branches = (path: string) => {
 		silent: true,
 		fatal: true,
 	});
-	return code !== 0 ? [] : stdout.split('\n');
+	return code !== 0
+		? []
+		: stdout
+				.split('\n')
+				.map((e) => e.trim())
+				.filter((e) => e);
 };
 
 export const parseIssueIds = (s: string): string[] => {
@@ -35,7 +40,7 @@ export const issuesFromRepo = (path: string, showMasterIssues: boolean): [RepoIs
 	const idToBranches = new Map<string, Set<string>>();
 	for (const branch of branches(path)) {
 		const issueIds = parseIssueIds(branch);
-		if (issueIds.length === 0) noIssueBranches.add(branch);
+		if (issueIds.length === 0 && !['origin/master', 'origin/production'].includes(branch)) noIssueBranches.add(branch);
 		for (const issueId of issueIds) {
 			if (!idToBranches.has(issueId)) idToBranches.set(issueId, new Set());
 			idToBranches.get(issueId)!.add(branch);
@@ -52,6 +57,8 @@ export const issuesFromRepo = (path: string, showMasterIssues: boolean): [RepoIs
 			if (!idToBranches.has(issueId)) result.push({ issueId, branches: ['master'] });
 		});
 	}
+
+	console.log([...noIssueBranches]);
 
 	return [
 		devMode ? result.slice(1, 5) : result,
