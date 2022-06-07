@@ -23,7 +23,7 @@ export const IssueState: FC<{ state: string }> = ({ state }) => {
 
 export const IssueId: FC<{ id: string; onBoard?: boolean; duty?: boolean }> = ({ id, onBoard, duty }) => {
 	return (
-		<Text backgroundColor={onBoard ? 'yellow' : undefined} color={duty ? 'blue' : undefined}>
+		<Text backgroundColor={onBoard ? 'yellowBright' : undefined} color={duty ? 'blue' : undefined}>
 			[{id.padStart(10, ' ')}]
 		</Text>
 	);
