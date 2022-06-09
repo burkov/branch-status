@@ -142,6 +142,15 @@ export const IssuesTable: FC<{ token: string; repoIssues: RepoIssue[]; noIssuesB
 	const [branchEnv, setBranchEnv] = useState<[string, string][]>([]);
 
 	useEffect(() => {
+		for (const envName in envs) {
+			deployedBranch(envName)
+				.then((deployedBranchToEnvName) => {
+					setBranchEnv((prev) => {
+						return [...prev, deployedBranchToEnvName];
+					});
+				})
+				.catch(() => undefined);
+		}
 		for (const issue of repoIssues) {
 			fetchIssue(token, issue).then((resolvedIssue) =>
 				setResolved((prev) => {
@@ -156,15 +165,6 @@ export const IssuesTable: FC<{ token: string; repoIssues: RepoIssue[]; noIssuesB
 					);
 				}),
 			);
-		}
-		for (const envName in envs) {
-			deployedBranch(envName)
-				.then((deployedBranchToEnvName) => {
-					setBranchEnv((prev) => {
-						return [...prev, deployedBranchToEnvName];
-					});
-				})
-				.catch(() => undefined);
 		}
 	}, []);
 

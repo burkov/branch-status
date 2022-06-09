@@ -3,6 +3,10 @@ import React from 'react';
 import { render } from 'ink';
 import meow from 'meow';
 import App from './components/app';
+import axiosRetry from 'axios-retry';
+import axios from 'axios';
+
+axiosRetry(axios, { retries: 3 });
 
 const cli = meow(
 	`
