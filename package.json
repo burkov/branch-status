@@ -1,6 +1,6 @@
 {
 	"name": "branch-status",
-	"version": "2.0.11",
+	"version": "2.0.12",
 	"license": "MIT",
 	"bin": {
 		"branch-status": "dist/cli.js"
