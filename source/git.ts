@@ -6,14 +6,11 @@ export interface RepoIssue {
 }
 
 const masterCommits = (path: string) => {
-	const { code, stdout } = shell.exec(
-		`(cd "${path}" && git log --first-parent origin/master --oneline | head -n 100)`,
-		{
-			silent: true,
-			fatal: true,
-		},
-	);
-	return code !== 0 ? [] : stdout.split('\n');
+	const { code, stdout } = shell.exec(`(cd "${path}" && git log --first-parent origin/master --oneline)`, {
+		silent: true,
+		fatal: true,
+	});
+	return code !== 0 ? [] : stdout.split('\n').slice(0, 100);
 };
 
 const branches = (path: string) => {
