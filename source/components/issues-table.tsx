@@ -8,6 +8,7 @@ import Spinner from 'ink-spinner';
 import { getCliArgumentsAndParams } from '../cli';
 import { NoIssuesBranches } from './no-issue-branches';
 import { deployedBranch, envs } from '../envs';
+import { appConfDir } from '../token';
 
 const colors: { [key: string]: any } = {
 	Implemented: 'green',
@@ -174,6 +175,7 @@ export const IssuesTable: FC<{ token: string; repoIssues: RepoIssue[]; noIssuesB
 				return <IssuesRow issue={issue} key={issue.issueId} branchEnv={branchEnv} />;
 			})}
 			<NoIssuesBranches noIssuesBranches={noIssuesBranches} branchEnv={branchEnv} />
+			<Text>Config dir: {appConfDir}</Text>
 		</>
 	);
 };
