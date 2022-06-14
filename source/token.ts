@@ -1,7 +1,7 @@
 import * as fs from 'fs';
+import * as os from 'os';
 
-// @ts-ignore
-export const appConfDir = `${process.env.HOME}/.config/branch-status`;
+export const appConfDir = `${os.homedir()}/.config/branch-status`;
 
 const tokenFromConfig = () => {
 	try {
