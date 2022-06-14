@@ -175,7 +175,6 @@ export const IssuesTable: FC<{ token: string; repoIssues: RepoIssue[]; noIssuesB
 				return <IssuesRow issue={issue} key={issue.issueId} branchEnv={branchEnv} />;
 			})}
 			<NoIssuesBranches noIssuesBranches={noIssuesBranches} branchEnv={branchEnv} />
-			<Text>Config dir: {appConfDir}</Text>
 		</>
 	);
 };
