@@ -8,7 +8,6 @@ import Spinner from 'ink-spinner';
 import { getCliArgumentsAndParams } from '../cli';
 import { NoIssuesBranches } from './no-issue-branches';
 import { deployedBranch, envs } from '../envs';
-import { appConfDir } from '../token';
 
 const colors: { [key: string]: any } = {
 	Implemented: 'green',
