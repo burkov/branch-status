@@ -9,11 +9,13 @@ export const envs: { [key: string]: string } = {
 	audt: 'https://active.jetprofile-audt.intellij.net',
 };
 
-export const deployedBranch = async (key: string): Promise<[string, string]> => {
+export const deployedBranch = async (key: string): Promise<[string, string] | null> => {
 	const host = envs[key];
 	const { data }: { data: string } = await axios.get(`${host}/build`, { timeout: 5000 });
 	const firstDashIndex = data.indexOf('-');
 	const secondDashIndex = data.indexOf('-', firstDashIndex + 1);
 	const lastDashIndex = data.lastIndexOf('-');
-	return [data.slice(secondDashIndex + 1, lastDashIndex), key];
+	const issueName = data.slice(secondDashIndex + 1, lastDashIndex).trim();
+	if (!issueName) return null;
+	return [issueName, key];
 };

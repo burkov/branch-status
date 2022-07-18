@@ -145,9 +145,10 @@ export const IssuesTable: FC<{ token: string; repoIssues: RepoIssue[]; noIssuesB
 		for (const envName in envs) {
 			deployedBranch(envName)
 				.then((deployedBranchToEnvName) => {
-					setBranchEnv((prev) => {
-						return [...prev, deployedBranchToEnvName];
-					});
+					if (deployedBranchToEnvName)
+						setBranchEnv((prev) => {
+							return [...prev, deployedBranchToEnvName];
+						});
 				})
 				.catch(() => undefined);
 		}
