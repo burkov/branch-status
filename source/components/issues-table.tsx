@@ -10,18 +10,22 @@ import { NoIssuesBranches } from './no-issue-branches';
 import { deployedBranch, envs } from '../envs';
 
 const colors: { [key: string]: any } = {
+	'In Clarification': 'blackBright',
+	Open: 'blackBright',
 	Implemented: 'green',
+	'Ready for Verification': 'green',
 	'To be discussed': 'red',
 	'Wait for Reply': 'red',
 	'In Progress': 'yellow',
-	Reopened: 'yellow',
+	Reopened: 'yellowBright',
 	Incomplete: 'yellow',
+	'Under Verification': 'cyan',
 	'Without Verification': 'blue',
-	'Under Verification': 'blue',
 	Verified: 'blue',
 };
 
 const statusPretty = (s: string) => {
+	if (s === 'Ready for Verification') return 'For Verification';
 	if (s === 'Under Verification') return 'Verification';
 	if (s === 'Without Verification') return 'W/o verify';
 	return s;
