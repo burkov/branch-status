@@ -27,7 +27,7 @@ const branches = (path: string) => {
 };
 
 export const parseIssueIds = (s: string): string[] => {
-	return (s.match(/\w{3,4}-\d{2,6}/gi) ?? []).map((e) => e.toUpperCase().trim());
+	return (s.match(/(JPF|BAD|FLS)-\d{2,6}/gi) ?? []).map((e) => e.toUpperCase().trim());
 };
 
 export const issuesFromRepo = (path: string, showMasterIssues: boolean): [RepoIssue[], string[]] => {

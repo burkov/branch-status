@@ -32,7 +32,7 @@ const statusPretty = (s: string) => {
 };
 
 export const IssueState: FC<{ issue: Issue }> = ({ issue: { state, errorDescription, summary } }) => {
-	const padding = 15;
+	const padding = 16;
 	if (state) return <Text color={colors[state]}>{statusPretty(state).padStart(padding)}</Text>;
 	if (errorDescription) return <Text color="red">{':FAILED:'.padStart(padding)}</Text>;
 	if (!state && summary) return <Text color="yellow">{'UNKNOWN'.padStart(padding)}</Text>;
@@ -89,13 +89,14 @@ export const Description: FC<{ issue: Issue; branchEnv: [string, string][] }> = 
 	issue: { summary, errorDescription, testedBy, branches },
 	branchEnv,
 }) => {
-	if (errorDescription) return <Text>{truncate(errorDescription, 120)}</Text>;
+	const truncateTo = 120;
+	if (errorDescription) return <Text>{truncate(errorDescription, truncateTo)}</Text>;
 	if (summary)
 		return (
 			<Text>
 				<Env branches={branches} branchEnv={branchEnv} />
 				<TestedBy testedBy={testedBy} />
-				{truncate(summary ?? '', 120)}
+				{truncate(summary ?? '', truncateTo - 20)}
 			</Text>
 		);
 	return (
