@@ -32,7 +32,7 @@ const statusPretty = (s: string) => {
 };
 
 export const IssueState: FC<{ issue: Issue }> = ({ issue: { state, errorDescription, summary } }) => {
-	const padding = 16;
+	const padding = 17;
 	if (state) return <Text color={colors[state]}>{statusPretty(state).padStart(padding)}</Text>;
 	if (errorDescription) return <Text color="red">{':FAILED:'.padStart(padding)}</Text>;
 	if (!state && summary) return <Text color="yellow">{'UNKNOWN'.padStart(padding)}</Text>;

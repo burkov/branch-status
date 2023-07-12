@@ -8,6 +8,7 @@ export const envs: { [key: string]: string } = {
 	dev6: 'https://active.jetprofile-dev6.intellij.net',
 	dev7: 'https://active.jetprofile-dev7.intellij.net',
 	dev8: 'https://active.jetprofile-dev8.intellij.net',
+	dev9: 'https://active.jetprofile-dev9.intellij.net',
 	audt: 'https://active.jetprofile-audt.intellij.net',
 };
 
